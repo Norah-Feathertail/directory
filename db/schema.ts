@@ -1,25 +1,24 @@
-import { text, sqliteTable, integer } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
+import { text, pgTable, serial, boolean, timestamp } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // Categories table
-export const categories = sqliteTable("categories", {
+export const categories = pgTable("categories", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
   slug: text("slug").notNull().unique(),
   color: text("color"), // For UI customization
   icon: text("icon"), // For UI customization
-  createdAt: integer("created_at", { mode: "timestamp" })
+  createdAt: timestamp("created_at")
     .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: integer("updated_at", { mode: "timestamp" }),
+    .defaultNow(),
+  updatedAt: timestamp("updated_at"),
 });
 
 // Bookmarks table
-export const bookmarks = sqliteTable("bookmarks", {
+export const bookmarks = pgTable("bookmarks", {
   // Core fields
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   url: text("url").notNull().unique(),
   title: text("title").notNull(),
   slug: text("slug").notNull().unique(),
@@ -40,20 +39,20 @@ export const bookmarks = sqliteTable("bookmarks", {
   ogDescription: text("og_description"), // Open Graph description
 
   // Timestamps
-  createdAt: integer("created_at", { mode: "timestamp" })
+  createdAt: timestamp("created_at")
     .notNull()
-    .default(sql`(unixepoch())`),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .defaultNow(),
+  updatedAt: timestamp("updated_at")
     .notNull()
-    .default(sql`(unixepoch())`),
-  lastVisited: integer("last_visited", { mode: "timestamp" }),
+    .defaultNow(),
+  lastVisited: timestamp("last_visited"),
 
   // User data
   notes: text("notes"), // Personal notes about the bookmark
-  isArchived: integer("is_archived", { mode: "boolean" })
+  isArchived: boolean("is_archived")
     .notNull()
     .default(false),
-  isFavorite: integer("is_favorite", { mode: "boolean" })
+  isFavorite: boolean("is_favorite")
     .notNull()
     .default(false),
   search_results: text("search_results"),
